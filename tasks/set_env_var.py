@@ -5,7 +5,6 @@ from cumulusci.utils.options import Field
 class SetEnvVars(BaseTask):
     class Options(CCIOptions):
         name: str = Field(..., description="The name of the experience site")
-        path: str = Field(..., description="The path of the experience bundle and related metadata")
         url_prefix: str = Field(..., description="The prefix of the experience site")
         template: str = Field(..., description="The template file to use")
 
