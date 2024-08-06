@@ -12,33 +12,16 @@ project:
     source_format: sfdx
 
 tasks:
-    robot:
-        options:
-            suites: robot/Experience/tests
-            options:
-                outputdir: robot/Experience/results
-
-    robot_testdoc:
-        options:
-            path: robot/Experience/tests
-            output: robot/Experience/doc/Experience_tests.html
-
-    run_tests:
-        options:
-            required_org_code_coverage_percent: 75
-
     # Administrative Tasks
-    add_standard_value_set_entries:
+    env:
+        description: Set environment variables
+        class_path: tasks.set_env_var.SetEnvVars
         options:
-            entries:
-                - fullName: "Funded"
-                  label: "Funded"
-                  closed: True
-                  forecastCategory: "Closed"
-                  probability: 100
-                  won: True
-            api_names:
-                - OpportunityStage
+            env_vars:
+                - key: EXPERIENCE_SITE_NAME
+                  value: "Default Experience Site"
+                - key: EXPERIENCE_SITE_PREFIX
+                  value: "exp"
 
     retrieve_experience_bundle:
         description: Retrieve Experience Bundle
@@ -49,55 +32,41 @@ tasks:
     unzip_experience_bundle:
         description: Unzip Experience Bundle
         class_path: cumulusci.tasks.command.Command
-        group: LitifyMDAPI
+        group: "experience"
         options:
             command: "unzip -o unpackaged/config/experience/temp/experience.zip -d unpackaged/config/experience/temp && rm -R unpackaged/config/experience/temp/experience.zip"
     
     move_experience_bundle:
         description: Move Converted Connected App to src directory
         class_path: cumulusci.tasks.command.Command
-        group: LitifyMDAPI
+        group: "experience"
         options:
             command: "mv unpackaged/config/experience/temp/unpackaged/experiences unpackaged/config/experience/ && rm -R unpackaged/config/experience/temp"
-    
-    patch_experience_scratch:
-        description: Set devName to "Quip_Docs_Related_List__c"
-        class_path: cumulusci.tasks.command.Command
-        options:
-            command: >
-                jq ".devName = \"Quip_Docs_Related_List__c\"" unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json > unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json.tmp &&
-                mv unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json.tmp unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json
-
-    patch_experience_managed:
-        description: Set devName to "Quip_Docs_Related_List"
-        class_path: cumulusci.tasks.command.Command
-        options:
-            command: >
-                jq ".devName = \"Quip_Docs_Related_List\"" unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json > unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json.tmp &&
-                mv unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json.tmp unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json
 
     deploy_experience_bundle:
         class_path: cumulusci.tasks.salesforce.Deploy
         options:
             path: unpackaged/config/experience/temp/unpackaged/experiences
-
-    # Packaging Tasks
-    create_package_version:
-        group: "packaging"
-        description: "Creates a new package version"
-        class_path: cumulusci.tasks.create_package_version.CreatePackageVersion
-        options:
-            org_dependent: True
+            transforms:
+                - transform: find_replace
+                  options:
+                      patterns:
+                          - find: DOMAIN
+                            inject_org_url: True
+                          - find: EXPERIENCE_SITE_NAME
+                            replace_env: EXPERIENCE_SITE_NAME
+                          - find: EXPERIENCE_SITE_PREFIX
+                            replace_env: EXPERIENCE_SITE_PREFIX
 
     # Digital Experience Setup Tasks
     create_experience:
         group: "experience"
-        description: "Creates a Digital Experience site with the 'Customer Service' template"
+        description: "Creates a Digital Experience site with the specified template"
         class_path: cumulusci.tasks.salesforce.CreateCommunity
         options:
             template: Build Your Own
-            name: "%%%EXPERIENCE_NAME%%%"
-            url_path_prefix: mf
+            name: ^^env.EXPERIENCE_SITE_NAME
+            url_path_prefix: ^^env.EXPERIENCE_SITE_PREFIX
             timeout: 60000
             skip_existing: true
 
@@ -110,10 +79,10 @@ tasks:
 
     publish_experience:
         group: "experience"
-        description: Publishes the ""%%%EXPERIENCE_NAME%%%"" Experience Site in the target org using the Connect API
+        description: Publishes the specified Experience Site in the target org using the Connect API
         class_path: cumulusci.tasks.salesforce.PublishCommunity
         options:
-            name: "%%%EXPERIENCE_NAME%%%"
+            name: ^^env.EXPERIENCE_SITE_NAME
 
     create_experience_owner:
         group: "experience"
@@ -133,7 +102,7 @@ tasks:
     
     add_experience_login_button:
         group: "experience"
-        description: Adds the "Log in to %%%EXPERIENCE_NAME%%% as User" button to the Standard Contact layout
+        description: Adds the "Log in to EXPERIENCE_SITE_NAME as User" button to the Standard Contact layout
         class_path: cumulusci.tasks.metadata_etl.layouts.AddRecordPlatformActionListItem
         options:
             api_names: "Contact-Contact Layout"
@@ -146,7 +115,7 @@ tasks:
         description: "Create a NetworkMemberGroup record for the community user profile"
         class_path: cumulusci.tasks.salesforce.network_member_group.CreateNetworkMemberGroups
         options:
-            network_name: "%%%EXPERIENCE_NAME%%%"
+            network_name: ^^env.EXPERIENCE_SITE_NAME
             profile_names:
                 - Customer Community User
 
@@ -183,6 +152,8 @@ flows:
 
     make_experience:
         steps:
+            0:
+                task: env
             1:
                 task: create_experience
             2: 
@@ -191,9 +162,7 @@ flows:
                 task: create_experience_owner
             4:
                 task: update_admin_profile
-            5.1:
-                task: patch_experience_scratch
-            5.2:
+            5:
                 task: deploy_experience_cloud
             6:
                 task: update_admin_profile
@@ -210,11 +179,11 @@ flows:
 
     deploy_experience:
         steps:
+            0:
+                task: env
             1:
                 task: create_experience
             2: 
-                task: patch_experience_managed
-            3:
                 task: deploy_experience_cloud
             4:
                 task: publish_experience
