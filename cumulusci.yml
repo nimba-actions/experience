@@ -158,29 +158,23 @@ flows:
             3:
                 task: create_experience_owner
             4:
-                task: update_admin_profile
-            5:
-                task: deploy_experience_cloud
-            6:
-                task: update_admin_profile
-            7:
-                task: create_experience_user
-            8:
-                task: publish_experience
-            9:
-                task: add_experience_login_button
-            10:
-                task: add_network_members
-            11:
-                task: snapshot_changes
+                task: update_admin_profile       
 
     deploy_experience:
         steps:
             0:
                 task: env
             1:
-                task: create_experience
-            2: 
                 task: deploy_experience_cloud
+            2:
+                task: update_admin_profile
+            3:
+                task: create_experience_user
             4:
                 task: publish_experience
+            5:
+                task: add_experience_login_button
+            6:
+                task: add_network_members
+            7:
+                task: snapshot_changes
