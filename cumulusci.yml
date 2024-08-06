@@ -19,6 +19,7 @@ tasks:
         options:
             name: "Default Experience Site"
             url_prefix: "exp"
+            template: "Customer Service"
 
     retrieve_experience_bundle:
         description: Retrieve Experience Bundle
@@ -61,7 +62,7 @@ tasks:
         description: "Creates a Digital Experience site with the specified template"
         class_path: cumulusci.tasks.salesforce.CreateCommunity
         options:
-            template: Build Your Own
+            template: ^^env.EXPERIENCE_SITE_TEMPLATE
             name: ^^env.EXPERIENCE_SITE_NAME
             url_path_prefix: ^^env.EXPERIENCE_SITE_PREFIX
             timeout: 60000
