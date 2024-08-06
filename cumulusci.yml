@@ -158,7 +158,9 @@ flows:
             3:
                 task: create_experience_owner
             4:
-                task: update_admin_profile       
+                task: update_admin_profile
+            5:
+                task: snapshot_changes   
 
     deploy_experience:
         steps:
@@ -177,4 +179,6 @@ flows:
             6:
                 task: add_network_members
             7:
+                task: update_admin_profile
+            8:
                 task: snapshot_changes
