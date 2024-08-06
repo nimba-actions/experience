@@ -37,5 +37,5 @@ sources:
 ### 4. Run the following command - options must be provided via CLI for now :(
 
 ```
-cci flow run make_experience --org dev --debug -o env__name "Surveys" -o env__url_prefix "surveys"
+cci flow run make_experience --org dev --debug -o env__name "My_Experience_Api_Name" -o env__url_prefix "my-url-prefix"
 ```
