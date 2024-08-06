@@ -21,7 +21,7 @@ class SetEnvVars(BaseTask):
         
     def _set_return_values(self):
         self.return_values = {
-            "name": self.parsed_options.name,
-            "url_prefix": self.parsed_options.url_prefix,
-            "template": self.parsed_options.template,
+            "EXPERIENCE_SITE_NAME": self.parsed_options.name,
+            "EXPERIENCE_SITE_PREFIX": self.parsed_options.url_prefix,
+            "EXPERIENCE_SITE_TEMPLATE": self.parsed_options.template,
         }
