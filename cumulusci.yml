@@ -68,12 +68,13 @@ tasks:
             timeout: 60000
             skip_existing: true
 
-    deploy_experience_cloud:
-        group: "experience"
-        description: Deploys the Experience Bundle and other related metadata to the target org
-        class_path: cumulusci.tasks.salesforce.Deploy
-        options:
-            path: ^^env.EXPERIENCE_SITE_PATH
+    # Seemingly unable to deploy the Experience Bundle with a locally provided path
+    # deploy_experience_cloud:
+    #     group: "experience"
+    #     description: Deploys the Experience Bundle and other related metadata to the target org
+    #     class_path: cumulusci.tasks.salesforce.Deploy
+    #     options:
+    #         path: ^^env.EXPERIENCE_SITE_PATH
 
     publish_experience:
         group: "experience"
