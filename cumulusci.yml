@@ -147,7 +147,7 @@ flows:
                     ignore_row_errors: True
                     dataset: experience_seed
 
-    make_experience:
+    create:
         steps:
             0:
                 task: env
@@ -162,7 +162,7 @@ flows:
             5:
                 task: snapshot_changes   
 
-    deploy_experience:
+    deploy:
         steps:
             0:
                 task: env
