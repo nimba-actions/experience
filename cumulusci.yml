@@ -148,7 +148,7 @@ flows:
                     ignore_row_errors: True
                     dataset: experience_seed
 
-    create:
+    exp_deploy_pre:
         steps:
             0:
                 task: env
@@ -163,23 +163,19 @@ flows:
             5:
                 task: snapshot_changes   
 
-    deploy:
+    exp_deploy_post:
         steps:
             0:
                 task: env
             1:
-                task: deploy_experience_cloud
-            2:
-                task: update_admin_profile
-            3:
                 task: create_experience_user
-            4:
+            2:
                 task: publish_experience
-            5:
+            3:
                 task: add_experience_login_button
-            6:
+            4:
                 task: add_network_members
-            7:
+            5:
                 task: update_admin_profile
-            8:
+            6:
                 task: snapshot_changes
