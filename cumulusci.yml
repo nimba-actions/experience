@@ -17,11 +17,8 @@ tasks:
         description: Set environment variables
         class_path: tasks.set_env_var.SetEnvVars
         options:
-            env_vars:
-                - key: EXPERIENCE_SITE_NAME
-                  value: "Default Experience Site"
-                - key: EXPERIENCE_SITE_PREFIX
-                  value: "exp"
+            name: "Default Experience Site"
+            url_prefix: "exp"
 
     retrieve_experience_bundle:
         description: Retrieve Experience Bundle

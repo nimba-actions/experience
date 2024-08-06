@@ -4,13 +4,13 @@ from cumulusci.utils.options import Field
 
 class SetEnvVars(BaseTask):
     class Options(CCIOptions):
-        env_vars: list = Field(..., description="A list of key-value pairs for environment variables")
+        name: str = Field(..., description="The name of the experience site")
+        url_prefix: str = Field(..., description="The prefix of the experience site")
 
     parsed_options: Options
 
     def _run_task(self):
-        for env_var in self.parsed_options.env_vars:
-            key = env_var.get('key')
-            value = env_var.get('value')
-            os.environ[key] = value
-            self.logger.info(f"Set {key} environment variable to {value}")
+        os.environ['EXPERIENCE_SITE_NAME'] = self.parsed_options.name
+        os.environ['EXPERIENCE_SITE_PREFIX'] = self.parsed_options.url_prefix
+        self.logger.info(f"Set EXPERIENCE_SITE_NAME to {self.parsed_options.name}")
+        self.logger.info(f"Set EXPERIENCE_SITE_PREFIX to {self.parsed_options.url_prefix}")
