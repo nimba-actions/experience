@@ -1,0 +1,17 @@
+{
+    "packageDirectories": [
+      {
+        "path": "force-app",
+        "default": true,
+        "package": "Mobilization Funding Foundation",
+        "versionName": "ver 1.0",
+        "versionNumber": "1.0.0.NEXT",
+        "versionDescription": "Initial version of Mobilization Funding Core Package"
+      }
+    ],
+    "namespace": null,
+    "sourceApiVersion": "60.0",
+    "packageAliases": {
+    }
+  }
+  

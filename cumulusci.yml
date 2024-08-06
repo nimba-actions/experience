@@ -1,0 +1,220 @@
+minimum_cumulusci_version: '3.78.0'
+project:
+    name: Experience
+    package:
+        name: Experience
+        api_version: '61.0'
+    git:
+        default_branch: 'main'
+        prefix_feature: 'feature/'
+        prefix_beta: 'beta/'
+        prefix_release: 'release/'
+    source_format: sfdx
+
+tasks:
+    robot:
+        options:
+            suites: robot/Experience/tests
+            options:
+                outputdir: robot/Experience/results
+
+    robot_testdoc:
+        options:
+            path: robot/Experience/tests
+            output: robot/Experience/doc/Experience_tests.html
+
+    run_tests:
+        options:
+            required_org_code_coverage_percent: 75
+
+    # Administrative Tasks
+    add_standard_value_set_entries:
+        options:
+            entries:
+                - fullName: "Funded"
+                  label: "Funded"
+                  closed: True
+                  forecastCategory: "Closed"
+                  probability: 100
+                  won: True
+            api_names:
+                - OpportunityStage
+
+    retrieve_experience_bundle:
+        description: Retrieve Experience Bundle
+        class_path: cumulusci.tasks.sfdx.SFDXOrgTask
+        options:
+            command: "force:mdapi:retrieve -k unpackaged/config/experience/package.xml -r unpackaged/config/experience/temp --json --zipfilename experience.zip"
+
+    unzip_experience_bundle:
+        description: Unzip Experience Bundle
+        class_path: cumulusci.tasks.command.Command
+        group: LitifyMDAPI
+        options:
+            command: "unzip -o unpackaged/config/experience/temp/experience.zip -d unpackaged/config/experience/temp && rm -R unpackaged/config/experience/temp/experience.zip"
+    
+    move_experience_bundle:
+        description: Move Converted Connected App to src directory
+        class_path: cumulusci.tasks.command.Command
+        group: LitifyMDAPI
+        options:
+            command: "mv unpackaged/config/experience/temp/unpackaged/experiences unpackaged/config/experience/ && rm -R unpackaged/config/experience/temp"
+    
+    patch_experience_scratch:
+        description: Set devName to "Quip_Docs_Related_List__c"
+        class_path: cumulusci.tasks.command.Command
+        options:
+            command: >
+                jq ".devName = \"Quip_Docs_Related_List__c\"" unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json > unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json.tmp &&
+                mv unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json.tmp unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json
+
+    patch_experience_managed:
+        description: Set devName to "Quip_Docs_Related_List"
+        class_path: cumulusci.tasks.command.Command
+        options:
+            command: >
+                jq ".devName = \"Quip_Docs_Related_List\"" unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json > unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json.tmp &&
+                mv unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json.tmp unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json
+
+    deploy_experience_bundle:
+        class_path: cumulusci.tasks.salesforce.Deploy
+        options:
+            path: unpackaged/config/experience/temp/unpackaged/experiences
+
+    # Packaging Tasks
+    create_package_version:
+        group: "packaging"
+        description: "Creates a new package version"
+        class_path: cumulusci.tasks.create_package_version.CreatePackageVersion
+        options:
+            org_dependent: True
+
+    # Digital Experience Setup Tasks
+    create_experience:
+        group: "experience"
+        description: "Creates a Digital Experience site with the 'Customer Service' template"
+        class_path: cumulusci.tasks.salesforce.CreateCommunity
+        options:
+            template: Build Your Own
+            name: "%%%EXPERIENCE_NAME%%%"
+            url_path_prefix: mf
+            timeout: 60000
+            skip_existing: true
+
+    deploy_experience_cloud:
+        group: "experience"
+        description: Deploys the post-install configuration emulating a customer-created Experience Cloud
+        class_path: cumulusci.tasks.salesforce.Deploy
+        options:
+            path: unpackaged/config/experience
+
+    publish_experience:
+        group: "experience"
+        description: Publishes the ""%%%EXPERIENCE_NAME%%%"" Experience Site in the target org using the Connect API
+        class_path: cumulusci.tasks.salesforce.PublishCommunity
+        options:
+            name: "%%%EXPERIENCE_NAME%%%"
+
+    create_experience_owner:
+        group: "experience"
+        description: POSTs json files to the Composite REST API endpoint.
+        class_path: cumulusci.tasks.salesforce.composite.CompositeApi
+        options:
+            data_files:
+                - "unpackaged/config/users/owner.json"
+
+    create_experience_user:
+        group: "experience"
+        description: POSTs json files to the Composite REST API endpoint.
+        class_path: cumulusci.tasks.salesforce.composite.CompositeApi
+        options:
+            data_files:
+                - "unpackaged/config/users/users.json"
+    
+    add_experience_login_button:
+        group: "experience"
+        description: Adds the "Log in to %%%EXPERIENCE_NAME%%% as User" button to the Standard Contact layout
+        class_path: cumulusci.tasks.metadata_etl.layouts.AddRecordPlatformActionListItem
+        options:
+            api_names: "Contact-Contact Layout"
+            action_name: LoginToNetworkAsUser
+            action_type: StandardButton
+            place_first: True
+
+    add_network_members:
+        group: "experience"
+        description: "Create a NetworkMemberGroup record for the community user profile"
+        class_path: cumulusci.tasks.salesforce.network_member_group.CreateNetworkMemberGroups
+        options:
+            network_name: "%%%EXPERIENCE_NAME%%%"
+            profile_names:
+                - Customer Community User
+
+flows:
+    config_dev: 
+        steps:
+            3:   
+                flow: make_experience
+    config_managed:
+        steps:
+            3:
+                flow: deploy_experience
+    
+    # Customize the Standard CumulusCI flows for seeding dependencies
+    custom_dependencies:
+        description: Additional custom dependency tasks
+        steps:
+            1:
+                task: add_standard_value_set_entries
+
+    dependencies:
+        steps:
+            3:
+                flow: custom_dependencies
+
+    load_data:
+        steps:
+            3:
+                task: load_sample_data
+                options:
+                    drop_missing_schema: True
+                    ignore_row_errors: True
+                    dataset: experience_seed
+
+    make_experience:
+        steps:
+            1:
+                task: create_experience
+            2: 
+                flow: load_data
+            3:
+                task: create_experience_owner
+            4:
+                task: update_admin_profile
+            5.1:
+                task: patch_experience_scratch
+            5.2:
+                task: deploy_experience_cloud
+            6:
+                task: update_admin_profile
+            7:
+                task: create_experience_user
+            8:
+                task: publish_experience
+            9:
+                task: add_experience_login_button
+            10:
+                task: add_network_members
+            11:
+                task: snapshot_changes
+
+    deploy_experience:
+        steps:
+            1:
+                task: create_experience
+            2: 
+                task: patch_experience_managed
+            3:
+                task: deploy_experience_cloud
+            4:
+                task: publish_experience
