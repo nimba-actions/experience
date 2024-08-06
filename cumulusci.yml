@@ -70,10 +70,10 @@ tasks:
 
     deploy_experience_cloud:
         group: "experience"
-        description: Deploys the post-install configuration emulating a customer-created Experience Cloud
+        description: Deploys the Experience Bundle and other related metadata to the target org
         class_path: cumulusci.tasks.salesforce.Deploy
         options:
-            path: unpackaged/config/experience
+            path: ^^env.EXPERIENCE_SITE_PATH
 
     publish_experience:
         group: "experience"
