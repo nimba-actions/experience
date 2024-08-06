@@ -1,22 +1,41 @@
 # Experience
 
-Add a brief description of this project here, in Markdown format.
-It will be shown on the main page of the project's GitHub repository.
 
-## Development
+### 1. Paste the following into the "root" section of your cumulusci.yml
 
-To work on this project in a scratch org:
+```
+sources:
+    experience:
+        github: https://github.com/nimba-actions/experience
+        allow_remote_code: True
+```
 
-1. [Set up CumulusCI](https://cumulusci.readthedocs.io/en/latest/tutorial.html)
-2. Run `cci flow run dev_org --org dev` to deploy this project.
-3. Run `cci org browser dev` to open the org in your browser.
+### 2. Paste the following section into the "tasks" section of your cumulusci.yml file
 
-## Delivery
+```
+    
+    deploy_experience_cloud:
+        group: "experience"
+        description: Deploys the Experience Bundle and other related metadata to the target org
+        class_path: cumulusci.tasks.salesforce.Deploy
+        options:
+            path: "unpackaged/config/experience"
+```
+### 3. Paste the following section into the "flows" section of your cumulusci.yml file
 
-To release a new version of this project:
+``` 
+    make_experience:
+        steps:
+            1:
+                flow: experience:deploy_pre
+            2:
+                task: deploy_experience_cloud
+            3:
+                flow: experience:deploy_post
+```
 
-1. Check out the `main` branch in your local dev environment.
-2. Run `git fetch origin` followed by `git pull` to ensure the latest commits are captured locally.
-3. Run `cci flow run dependencies --org dev` to prepare a "Packaging Org".
-4. Run `cci flow run release_unlocked_beta --org dev --debug` to generate a new beta release.
-5. Run `cci flow run release_unlocked_prod --org dev --debug` to promote the latest beta release.
+### 4. Run the following command - options must be provided via CLI for now :(
+
+```
+cci flow run make_experience --org dev --debug -o env__name "Surveys" -o env__url_prefix "surveys"
+```
