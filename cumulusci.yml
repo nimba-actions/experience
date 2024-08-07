@@ -16,10 +16,10 @@ tasks:
     env:
         description: Set environment variables
         class_path: tasks.set_env_var.SetEnvVars
-        options:
-            name: "Default Experience Site"
-            url_prefix: "exp"
-            template: "Customer Service"
+        # options:
+        #     name: "Default Experience Site"
+        #     url_prefix: "exp"
+        #     template: "Customer Service"
 
     retrieve_experience_bundle:
         description: Retrieve Experience Bundle
