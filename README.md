@@ -1,4 +1,4 @@
-# Experience Project
+# Experience
 
 This project automates the setup and deployment of a Salesforce Digital Experience (formerly known as Community).
 
