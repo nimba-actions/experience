@@ -37,11 +37,8 @@ sources:
                 flow: experience:deploy_post
 ```
 
-#### [ OPTIONAL ] This affects the following flows: 
-- dev_org
-- dev_org_beta_deps
-- dev_org_namespaced
 ```
+    # [OPTIONAL]
     config_dev: 
         steps:
             3:   
@@ -50,23 +47,16 @@ sources:
                 task: assign_unpackaged_permission_sets
 ```
 
-#### [ OPTIONAL ] This affects the following flows: 
-- config_regression
-- regression_org
-- ci_beta
-- ci_release
-- install_beta
-- install_prod
 ```
+    # [OPTIONAL]
     config_managed:
         steps:
             3:
                 task: make_experience_cli
             4:
                 task: assign_unpackaged_permission_sets
-
+```
 
 ### 4. Retrieve your ExperienceBundle, Network, StaticResources, etc to `unpackaged/config/experience` (or whatever path you specified in `deploy_experience_cloud`)
 
-### 5. Voila! The following CCI Commands now provision your experience site
-```
+### 5. Voila! 
