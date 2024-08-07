@@ -3,7 +3,7 @@
 
 ### 1. Paste the following into the "root" section of your cumulusci.yml
 
-```
+```yml
 sources:
     experience:
         github: https://github.com/nimba-actions/experience
@@ -12,7 +12,7 @@ sources:
 
 ### 2. Paste the following sections into the "tasks" section of your cumulusci.yml file
 
-```
+```yml
     make_experience_cli:
         class_path: cumulusci.tasks.command.Command
         options:
@@ -26,7 +26,7 @@ sources:
             path: "unpackaged/config/experience" # change this to whatever you want
 ```
 ### 3. Paste the following sections into the "flows" section of your cumulusci.yml file
-```
+```yml
     make_experience:
         steps:
             1:
@@ -37,7 +37,7 @@ sources:
                 flow: experience:deploy_post
 ```
 
-```
+```yml
     # [OPTIONAL]
     config_dev: 
         steps:
@@ -47,7 +47,7 @@ sources:
                 task: assign_unpackaged_permission_sets
 ```
 
-```
+```yml
     # [OPTIONAL]
     config_managed:
         steps:
