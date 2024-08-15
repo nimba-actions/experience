@@ -165,10 +165,8 @@ flows:
             2:
                 task: publish_experience
             3:
-                task: add_experience_login_button
-            4:
                 task: add_network_members
-            5:
+            4:
                 task: update_admin_profile
-            6:
+            5:
                 task: snapshot_changes
