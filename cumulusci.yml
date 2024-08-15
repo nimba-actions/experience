@@ -166,8 +166,10 @@ flows:
                 task: publish_experience
             3:
                 task: add_experience_login_button
+                when: org_config.scratch
             4:
                 task: add_network_members
+                when: org_config.scratch
             5:
                 task: update_admin_profile
             6:
