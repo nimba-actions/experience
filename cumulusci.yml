@@ -83,6 +83,22 @@ tasks:
             data_files:
                 - "unpackaged/config/users/owner.json"
 
+    patch_experience_scratch:
+        description: Set devName to "Quip_Docs_Related_List__c"
+        class_path: cumulusci.tasks.command.Command
+        options:
+            command: >
+                jq ".devName = \"Quip_Docs_Related_List__c\"" unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json > unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json.tmp &&
+                mv unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json.tmp unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json
+
+    patch_experience_managed:
+        description: Set devName to "Quip_Docs_Related_List"
+        class_path: cumulusci.tasks.command.Command
+        options:
+            command: >
+                jq ".devName = \"Quip_Docs_Related_List\"" unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json > unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json.tmp &&
+                mv unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json.tmp unpackaged/config/experience/experiences/Mobilization_Funding1/routes/quipDocsRelatedList.json
+
     create_experience_user:
         group: "experience"
         description: POSTs json files to the Composite REST API endpoint.
@@ -151,6 +167,12 @@ flows:
                 flow: load_data
             3:
                 task: create_experience_owner
+            3.1:
+                task: patch_experience_scratch
+                when: org_config.scratch
+            3.2:
+                task: patch_experience_managed
+                when: not org_config.scratch
             4:
                 task: update_admin_profile
             5:
